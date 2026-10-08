@@ -12,7 +12,13 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from mtp.gt import haversine_m, load_points, load_schedule, load_traffic, lonlat_to_xy, reconstruct_stop_matches
+from mtp.gt import (
+    load_points,
+    load_schedule,
+    load_traffic,
+    lonlat_to_xy,
+    reconstruct_stop_matches,
+)
 from mtp.gt_priors import attach_priors, build_stop_priors
 
 WINDOWS_MIN = (5, 10, 15, 30)
@@ -40,7 +46,7 @@ def build_vehicle_point_features(
         veh_sched = schedule[schedule["tr_id"] == tr_id].sort_values("plan_s").reset_index(drop=True)
 
         t_all = veh_traffic["ts"].values.astype(np.int64)
-        valid = (veh_traffic["location_valid"] == True) & veh_traffic["lat"].notna()  # noqa: E712
+        valid = (veh_traffic["location_valid"] == True) & veh_traffic["lat"].notna()
         gv = veh_traffic[valid]
         g_t = gv["ts"].values.astype(np.int64)
         g_lat = gv["lat"].values.astype(float)
@@ -130,7 +136,7 @@ def build_vehicle_point_features(
                 feats["planned_gap_prev_s"] = np.nan
 
             if ti is not None:
-                ttrip = trip_of_pos[ti]
+                _ = trip_of_pos[ti]
                 feats["idx_in_trip"] = int(idx_in_trip[ti])
                 feats["n_stops_in_trip"] = int(n_in_trip[ti])
                 feats["stops_left_in_trip"] = int(n_in_trip[ti] - idx_in_trip[ti])
@@ -193,7 +199,7 @@ def main() -> None:
     out_dir = Path("data/gt")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    train_traffic = load_traffic(base / "train" / "traffic.csv")
+    load_traffic(base / "train" / "traffic.csv")
     train_schedule = load_schedule(base / "train" / "schedule.csv")
     priors = build_stop_priors(train_schedule)
     priors.to_parquet(out_dir / "stop_priors.parquet", index=False)
@@ -204,12 +210,11 @@ def main() -> None:
             traffic = load_traffic(base / "validate" / "traffic.csv")
             schedule = load_schedule(base / "validate" / "schedule_plan.csv")
             points = load_points(base / "validate" / "points.csv")
-            labeled = False
+
         else:
             traffic = load_traffic(base / split / "traffic.csv")
             schedule = load_schedule(base / split / "schedule.csv")
             points = load_points(base / "labels" / f"labels_{split}.csv")
-            labeled = True
         print(f"[features] {split}: traffic {len(traffic)}, schedule {len(schedule)}, points {len(points)}")
         feats = build_vehicle_point_features(traffic, schedule, points)
         if split == "train":

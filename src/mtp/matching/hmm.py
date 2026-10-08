@@ -23,6 +23,7 @@ import json
 import logging
 import math
 import time
+from itertools import pairwise
 from pathlib import Path
 
 import numpy as np
@@ -100,7 +101,7 @@ class RoadGraphIndex:
     # -- construction -------------------------------------------------------
 
     @classmethod
-    def from_overpass(cls, data: dict) -> "RoadGraphIndex":
+    def from_overpass(cls, data: dict) -> RoadGraphIndex:
         nodes: dict[int, tuple[float, float]] = {}
         ways: list[tuple[list[int], str]] = []
         for el in data.get("elements", []):
@@ -124,7 +125,7 @@ class RoadGraphIndex:
         names: list[str] = []
         for way_node_ids, name in ways:
             seq = [id2idx[nid] for nid in way_node_ids if nid in id2idx]
-            for a, b in zip(seq, seq[1:]):
+            for a, b in pairwise(seq):
                 if a != b:
                     edge_pairs.append((a, b))
             if name:
@@ -153,7 +154,7 @@ class RoadGraphIndex:
         )
 
     @classmethod
-    def load(cls, roads_json: Path | str) -> "RoadGraphIndex":
+    def load(cls, roads_json: Path | str) -> RoadGraphIndex:
         roads_json = Path(roads_json)
         compact = roads_json.with_name(roads_json.stem + ".compact.npz")
         if compact.exists():
@@ -236,7 +237,7 @@ def _build_inmem_map(sel_coords: np.ndarray, sub_edges: np.ndarray):
 
 
 class SnappedTrack:
-    __slots__ = ("ts", "lat", "lon", "src_ts", "raw_lat", "raw_lon")
+    __slots__ = ("lat", "lon", "raw_lat", "raw_lon", "src_ts", "ts")
 
     def __init__(self, ts: list[float], lat: list[float], lon: list[float], src_ts: float,
                  raw_lat: float | None = None, raw_lon: float | None = None):
@@ -255,7 +256,7 @@ class SnappedTrack:
 
 
 class _VehState:
-    __slots__ = ("snapped", "src_ts", "gap")
+    __slots__ = ("gap", "snapped", "src_ts")
 
     def __init__(self, min_gap_s: float):
         self.snapped: SnappedTrack | None = None
@@ -480,7 +481,7 @@ class HMMTrackMatcher:
         dy = np.diff(y)
         seg_len2 = dx * dx + dy * dy
         valid_seg = seg_len2 > 1e-9
-        for sid, plan, slat_p, slon_p in zip(stop_ids, stop_plan_s, stop_lat, stop_lon):
+        for sid, plan, slat_p, slon_p in zip(stop_ids, stop_plan_s, stop_lat, stop_lon, strict=False):
             if not (np.isfinite(plan) and np.isfinite(slat_p) and np.isfinite(slon_p)):
                 continue
             plan = float(plan)

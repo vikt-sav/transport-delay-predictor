@@ -1,10 +1,8 @@
+import math
 import sys
 from pathlib import Path
 
-import math
-
 import numpy as np
-import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -105,7 +103,7 @@ def speed_m_total(speed, n, dt):
 def test_stop_delays_mirror_radius_semantics(tmp_path):
     matcher = make_matcher(tmp_path)
     ts, lat, lon = moving_track()
-    snapped, fresh = matcher.snap_track(11, ts, lat, lon, allow_compute=True)
+    snapped, _fresh = matcher.snap_track(11, ts, lat, lon, allow_compute=True)
     assert snapped is not None
     # stop the vehicle passes ~at t0 + 150 s (6 m/s * 150 s = 900 m along the street)
     plan = float(ts[0]) + 150.0

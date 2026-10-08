@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import struct
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 NPL_SIG = 0x7E7E
 NPL_TYPE_NPH = 0x02
@@ -48,13 +48,13 @@ class NavRecord:
 def decode_nav00(unit_id: int, timestamp: int, payload: bytes) -> NavRecord | None:
     if len(payload) < 26:
         return None
-    lon_raw, lat_raw, dop, bat, sp_avg, sp_max, course, track, alt, nsat, pdop = _NAV00.unpack_from(payload, 4)
+    lon_raw, lat_raw, dop, _bat, sp_avg, _sp_max, course, _track, alt, nsat, _pdop = _NAV00.unpack_from(payload, 4)
     lon = (lon_raw / 1e7) * (1.0 if (dop >> 6) & 1 else -1.0)
     lat = (lat_raw / 1e7) * (1.0 if (dop >> 5) & 1 else -1.0)
     valid = bool((dop >> 7) & 1)
     return NavRecord(
         unit_id=unit_id,
-        ts=datetime.fromtimestamp(timestamp, tz=timezone.utc),
+        ts=datetime.fromtimestamp(timestamp, tz=UTC),
         lat=lat,
         lon=lon,
         location_valid=valid,
@@ -127,7 +127,7 @@ class NDTPFrameParser:
         swapped = ((got & 0xFF) << 8) | ((got >> 8) & 0xFF)
         if expected != swapped:
             return []
-        service_id, nph_type, _flags, _req = _NPH_HDR.unpack_from(nph_and_body, 0)
+        _service_id, nph_type, _flags, _req = _NPH_HDR.unpack_from(nph_and_body, 0)
         if nph_type != NPH_TYPE_REALTIME:
             return []
         peer = _NPL_HDR.unpack_from(npl, 0)[5]

@@ -24,7 +24,7 @@ va = pd.read_csv(
 va["ts"] = va["event_time"].astype("datetime64[ns]").astype("int64") // 10**9
 va = va.sort_values("event_time")
 t0 = va.ts.min()
-sub = va[(va.ts >= t0 + 12300) & (va.ts <= t0 + 14700) & (va.location_valid == True) & va.lat.notna()]  # noqa: E712
+sub = va[(va.ts >= t0 + 12300) & (va.ts <= t0 + 14700) & (va.location_valid == True) & va.lat.notna()]
 for r in sub.itertuples(index=False):
     p.add_record(
         int(r.tr_id), float(r.ts), float(r.lat), float(r.lon), True,

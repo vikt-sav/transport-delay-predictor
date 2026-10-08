@@ -11,8 +11,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from mtp.online import OnlinePipeline
 from mtp.gt import load_points, load_traffic
+from mtp.online import OnlinePipeline
 
 
 def run(args) -> None:
@@ -32,10 +32,8 @@ def run(args) -> None:
 
     traffic = traffic.sort_values("event_time")
     t0 = int(traffic["ts"].min())
-    labels_by_key = {(int(r.tr_id), int(r.T_s)): r for r in labels.itertuples(index=False)}
 
     preds = {}
-    t_stream = t0
     t_end = int(traffic["ts"].max())
     rows = list(traffic.itertuples(index=False))
     i = 0
@@ -47,7 +45,7 @@ def run(args) -> None:
     started = time.perf_counter()
     max_lag = 0.0
     for T in label_ts:
-        if T < t0 or T > t_end:
+        if t0 > T or t_end < T:
             continue
         while i < n and rows[i].ts <= T:
             r = rows[i]

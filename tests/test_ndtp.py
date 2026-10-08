@@ -14,7 +14,7 @@ def build_frame(unit_id: int, timestamp: int, lat: float, lon: float, speed: int
     nav_payload = struct.pack(
         "<III BB HHH HH BB",
         timestamp, lon_raw, lat_raw, dop, 0x0C,
-        speed, speed, course, 0, int(150), 9, 20,
+        speed, speed, course, 0, 150, 9, 20,
     )
     assert len(nav_payload) == 26, len(nav_payload)
     cells = bytes([0, 0]) + nav_payload

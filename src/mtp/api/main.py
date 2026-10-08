@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import contextlib
 import json
 import os
 from contextlib import asynccontextmanager
@@ -180,7 +179,6 @@ def build_backend_app(ml_url: str | None) -> FastAPI:
     async def _fetch(app: FastAPI, path: str) -> dict:
         if ml_url is None:
             ml_app = app.state.ml_app
-            client = app.state.client
             import httpx as _hx
 
             transport = _hx.ASGITransport(app=ml_app)

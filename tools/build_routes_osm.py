@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from mtp.gt import load_schedule
-from mtp.osm import RoadRouter, fetch_roads, haversine_m
+from mtp.osm import RoadRouter, fetch_roads
 
 
 def bbox_key(bbox) -> str:
@@ -66,7 +66,7 @@ def main() -> None:
                 "type": "Feature",
                 "properties": {
                     "tr_id": int(tr_id),
-                    "stops": int(len(group)),
+                    "stops": len(group),
                     "osm": True,
                     "fallback_segments": fallback_segments,
                 },

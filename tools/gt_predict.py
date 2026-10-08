@@ -33,7 +33,7 @@ def main() -> None:
 
     pred = np.clip(model.predict(df[cols]), CLIP_LO, CLIP_HI)
     sub = pd.read_csv(args.sample, sep=";")
-    mapping = dict(zip(df["sample_id"], pred))
+    mapping = dict(zip(df["sample_id"], pred, strict=False))
     sub["prediction"] = sub["sample_id"].map(mapping)
     assert sub["prediction"].notna().all(), "uncovered sample_ids"
     out = Path(args.out)

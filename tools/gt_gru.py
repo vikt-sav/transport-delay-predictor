@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
-import torch.nn as nn
+from torch import nn
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
@@ -32,7 +32,7 @@ def build_sequences(traffic: pd.DataFrame, points: pd.DataFrame) -> tuple[np.nda
     tr_points = points.reset_index(drop=True)
     for tr_id, grp in tr_points.groupby("tr_id"):
         veh = traffic[traffic["tr_id"] == tr_id]
-        veh = veh[(veh["location_valid"] == True) & veh["lat"].notna()]  # noqa: E712
+        veh = veh[(veh["location_valid"] == True) & veh["lat"].notna()]
         t = veh["ts"].values.astype(np.int64)
         lat = veh["lat"].values.astype(float)
         lon = veh["lon"].values.astype(float)

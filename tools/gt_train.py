@@ -26,7 +26,6 @@ def feature_cols(df: pd.DataFrame) -> list[str]:
 def evaluate(name: str, y: np.ndarray, pred: np.ndarray) -> dict:
     mae = float(np.mean(np.abs(y - pred)))
     mae_zero = float(np.mean(np.abs(y)))
-    mae_cur = float(np.mean(np.abs(y - 0)))  # placeholder replaced below
     return {"mae": mae, "mae_zero": mae_zero}
 
 

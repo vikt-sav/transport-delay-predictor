@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import math
+from itertools import pairwise
 from pathlib import Path
 
 import numpy as np
@@ -106,7 +107,7 @@ def build_graph(overpass_data: dict):
     G = nx.Graph()
     for way_nodes in ways:
         seq = [n for n in way_nodes if n in nodes]
-        for a, b in zip(seq, seq[1:]):
+        for a, b in pairwise(seq):
             if a == b:
                 continue
             la1, lo1 = nodes[a]
@@ -142,7 +143,7 @@ class RoadRouter:
     def nearest_node(self, lat: float, lon: float):
         x = (lon - self._lon0) * self._lon_scale
         y = (lat - self._lat0) * _LAT_M
-        dist, idx = self._tree.query([x, y])
+        _dist, idx = self._tree.query([x, y])
         return self._node_ids[int(idx)]
 
     def route_between(self, lat1: float, lon1: float, lat2: float, lon2: float) -> list[tuple[float, float]] | None:

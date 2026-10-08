@@ -3,10 +3,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import math
 import struct
 import sys
 import time
+from contextlib import suppress
 from pathlib import Path
 
 import pandas as pd
@@ -50,10 +50,10 @@ async def run(args) -> None:
     writer = None
     while True:
         if writer is None or writer.is_closing():
-            reader = writer = None
-            for attempt in range(60):
+            writer = None
+            for _attempt in range(60):
                 try:
-                    reader, writer = await asyncio.open_connection(args.host, args.port)
+                    _, writer = await asyncio.open_connection(args.host, args.port)
                     break
                 except OSError:
                     await asyncio.sleep(3)
@@ -91,10 +91,8 @@ async def run(args) -> None:
                 await writer.drain()
         except (ConnectionResetError, BrokenPipeError, OSError) as exc:
             print(f"[replay] connection lost ({exc}), reconnecting")
-            try:
+            with suppress(OSError):
                 writer.close()
-            except OSError:
-                pass
             writer = None
             await asyncio.sleep(3)
             continue

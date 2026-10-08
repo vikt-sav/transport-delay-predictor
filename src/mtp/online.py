@@ -6,15 +6,15 @@ available at prediction time, per the anti-leak rule.
 from __future__ import annotations
 
 import json
+import math
 import time
 from collections import deque
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import math
 
-from .gt import haversine_m, load_schedule, lonlat_to_xy, reconstruct_stop_matches
+from .gt import load_schedule, lonlat_to_xy, reconstruct_stop_matches
 from .gt_priors import add_stop_key
 
 WINDOW_S = 600
@@ -359,7 +359,7 @@ class OnlinePipeline:
                         sc["stop_lon"].values[m_pos],
                     )
                     if hmm_delays:
-                        delays = [hmm_delays.get(int(sid), d) for sid, d in zip(m["tt_action_item_id"].values, delays)]
+                        delays = [hmm_delays.get(int(sid), d) for sid, d in zip(m["tt_action_item_id"].values, delays, strict=False)]
                 if snapped is not None:
                     stuck = hmm.stuck_street(snapped, now_s)
                     if stuck is not None:

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from .ndtp import NavRecord, NDTPFrameParser
 
@@ -58,4 +58,4 @@ def nav_to_pipeline(rec: NavRecord, pipeline) -> None:
 
 
 def utc_now_iso() -> str:
-    return datetime.now(tz=timezone.utc).isoformat()
+    return datetime.now(tz=UTC).isoformat()

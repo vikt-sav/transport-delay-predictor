@@ -22,7 +22,7 @@ SMOOTHING = 20
 def target_encode(train: pd.DataFrame, apply: pd.DataFrame, col: str, y: pd.Series, global_mean: float) -> pd.Series:
     g = y.groupby(train[col]).agg(["sum", "count"])
     if col == "tr_id":
-        own = y.groupby(train[col])
+        y.groupby(train[col])
         # leave-one-vehicle-out for train rows is approximated per category
         stats = pd.DataFrame({"sum": g["sum"], "count": g["count"]})
     else:
@@ -105,7 +105,7 @@ def main() -> None:
         model.predict(Xte.loc[[i]])
     native_single = (time.perf_counter() - t0) / 100 * 1000
     t0 = time.perf_counter()
-    for i in single_idx:
+    for _ in single_idx:
         sess.run(None, {inp.name: mat[:1]})
     onnx_single = (time.perf_counter() - t0) / 100 * 1000
 

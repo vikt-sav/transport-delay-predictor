@@ -9,7 +9,13 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from mtp.gt import load_points, load_schedule, load_traffic, lonlat_to_xy, reconstruct_stop_matches
+from mtp.gt import (
+    load_points,
+    load_schedule,
+    load_traffic,
+    lonlat_to_xy,
+    reconstruct_stop_matches,
+)
 
 RADIUS_M = 90.0
 WINDOW_S = 300.0
@@ -18,7 +24,7 @@ PLAN_LEAD_S = 30.0
 
 def estimate_series(veh_traffic, veh_sched):
     """Per stop (plan_s): matched delay estimate via the shared matcher."""
-    veh_t = veh_traffic[(veh_traffic.location_valid == True) & veh_traffic.lat.notna()]  # noqa: E712
+    veh_t = veh_traffic[(veh_traffic.location_valid == True) & veh_traffic.lat.notna()]
     veh_s = veh_sched.dropna(subset=["stop_lat", "stop_lon"]).sort_values("plan_s")
     if veh_t.empty or veh_s.empty:
         return pd.DataFrame(columns=["plan_s", "est"])
