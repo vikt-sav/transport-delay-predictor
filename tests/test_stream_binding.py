@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -14,6 +15,8 @@ BASE = ROOT / "dataset"
 
 def make_pipeline(split: str = "validate") -> OnlinePipeline:
     sched = BASE / split / ("schedule_plan.csv" if split == "validate" else "schedule.csv")
+    if not sched.exists():
+        pytest.skip("dataset not available (gitignored) - CI-safe skip")
     return OnlinePipeline(str(sched), "data/gt/models/catboost_final.cbm", use_hmm_matching=False)
 
 
